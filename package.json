@@ -1,6 +1,5 @@
 {
-  "name": "chrome-extension-message",
-  "version": "1.0.0",
+  "name": "google-sites-to-markdown",
   "description": "",
   "main": "background.js",
   "scripts": {

@@ -13,6 +13,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       let childResult = "";
       switch (child.tagName) {
         case 'DIV':
+          if (child.className == "s1gOZb") {
+            childResult += convertCode(child);
+          }
           break;
         case 'H1':
           childResult += `# ${child.textContent}\n\n`;
@@ -42,6 +45,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log(result);
   navigator.clipboard.writeText(result);
 });
+
+const convertCode = (element) => {
+  result = "";
+  result += '```\n';
+  for (const child of element.children) {
+    result += `${child.textContent}\n`;
+  }
+  result += '```\n\n';
+  return result;
+}
 
 const convertUL = (element, indent) => {
   result = "";
