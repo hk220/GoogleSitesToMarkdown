@@ -1,6 +1,8 @@
-console.log("content_script.js injected");
+console.log("GoogleSitesToMarkdown: content_script.js injected");
 
 const INDENT = "    ";
+const PREFIX_UL="*";
+const PREFIX_OL="1.";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   let elements = window.document.querySelectorAll('.tyJCtd.mGzaTb.Depvyb.baZpAe');
@@ -13,16 +15,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         case 'DIV':
           break;
         case 'H1':
-          childResult += `# ${child.textContent}\n`;
+          childResult += `# ${child.textContent}\n\n`;
           break;
         case 'H2':
-          childResult += `## ${child.textContent}\n`;
+          childResult += `## ${child.textContent}\n\n`;
           break;
         case 'H3':
-          childResult += `### ${child.textContent}\n`;
+          childResult += `### ${child.textContent}\n\n`;
           break;
         case 'P':
-          childResult += child.textContent;
+          childResult += `${child.textContent}\n\n`;
           break;
         case 'UL':
           childResult += convertUL(child, "");
@@ -33,25 +35,24 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         default:
           console.log(child);
       }
-      elementResult += `${childResult}\n`
+      elementResult += childResult
     }
     result += elementResult
   }
   console.log(result);
+  navigator.clipboard.writeText(result);
 });
 
 const convertUL = (element, indent) => {
   result = "";
   for (const child of element.children) {
-    console.log(indent + child.tagName);
-    switch (child.tagName) {
+   switch (child.tagName) {
       case 'LI':
-        result += convertLI(child, '*', indent);
+        result += convertLI(child, PREFIX_UL, indent);
         break;
       default:
         console.log(child);
     }
-    result += '\n';
   }
   return result;
 }
@@ -59,15 +60,13 @@ const convertUL = (element, indent) => {
 const convertOL = (element, indent) => {
   result = "";
   for (const child of element.children) {
-    console.log(indent + child.tagName);
     switch (child.tagName) {
       case 'LI':
-        result += convertLI(child, '1.', indent);
+        result += convertLI(child, PREFIX_OL, indent);
         break;
       default:
         console.log(child);
     }
-    result += '\n';
   }
   return result;
 }
@@ -75,10 +74,9 @@ const convertOL = (element, indent) => {
 const convertLI = (element, prefix, indent) => {
   result = "";
   for (const child of element.children) {
-    console.log(indent + child.tagName);
     switch (child.tagName) {
       case 'P':
-        result += `${indent}${prefix} ${child.textContent}`;
+        result += `${indent}${prefix} ${child.textContent}\n`;
         break;
       case 'UL':
         result += convertUL(child, indent + INDENT);
@@ -89,7 +87,6 @@ const convertLI = (element, prefix, indent) => {
       default:
         console.log(child);
     }
-    result += '\n';
   }
   return result
 }
