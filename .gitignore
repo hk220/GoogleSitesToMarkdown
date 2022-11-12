@@ -131,3 +131,4 @@ dist
 
 # archive
 build
+.DS_Store
